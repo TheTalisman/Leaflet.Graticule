@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<title>Leaflet Lat/Lon Graticule Demo</title>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+	<link href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" rel="stylesheet" type="text/css" />
+	<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+
+
+	<script src="../Leaflet.Graticule.Simple.js"></script>
+
+
+	<!--
+	<link href="https://unpkg.com/leaflet@1.0.0/dist/leaflet.css" rel="stylesheet" type="text/css" />
+	<script src="https://unpkg.com/leaflet@1.0.0/dist/leaflet.js"></script>
+	-->
+
+	<style>
+		html { height: 100%; }
+		body { height: 100%; margin: 0; padding: 0;}
+
+#map
+{
+	height: 100%;
+	width: 100%;
+	background-color: #888888;
+}
+	</style>
+
+</head>
+<body>
+	<div id="map" class="map"></div>
+
+	<script>
+		//
+		//
+		// API Extension Methods
+		// ======================================================================
+		// ======================================================================
+
+		// Expose L.latLng as YX_Coord
+		const YX_Coord = L.latLng
+
+		// Add XY_Coord Method for working with coordinates in x, y format instead of y, x
+		const XY_Coord = function (x, y) {
+			if (L.Util.isArray(x)) { // When doing XY_Coord([x, y]);
+				return YX_Coord(x[1], x[0]);
+			}
+			return YX_Coord(y, x);  // When doing XY_Coord(x, y);
+		};
+
+		var MapMarkers = [];
+		var UtilityMarkers = [];
+
+		var map = new L.Map('map',
+		{
+				zoomControl:true,
+				crs: L.CRS.Simple,
+				continuousWorld: true,
+				noWrap: true,
+				minZoom: -2,
+				maxZoom: 3
+		})
+
+			//stamenTerrain = L.tileLayer('http://{s}.tile.stamen.com/terrain/{z}/{x}/{y}.png').addTo(map);
+
+			const bounds = [XY_Coord(0, 0), XY_Coord(1600, 1200)]
+			const image = L.imageOverlay('../images/middle-earth-map.jpeg', bounds).addTo(map);
+			image.setZIndex(-100);
+
+			map.fitBounds(bounds);
+
+		
+		var Graticule = L.latlngGraticule({
+			showLabel: true,
+			color: '#222',
+			zoomInterval: [
+				{start: -2, end: -1, interval: 100},
+				{start: 0, end: 1, interval: 50},
+				{start: 2, end: 2, interval: 10},
+				{start: 3, end: 3, interval: 10}
+			]
+		});
+		
+
+		
+		const LatLonBounds_OBJ = new L.LatLngBounds( bounds );
+		const PaddedMaxBounds = LatLonBounds_OBJ.pad(1.0);
+
+		// Set the navigable/viewable bounds of the map
+		map.setMaxBounds(PaddedMaxBounds);
+
+
+		// Map Marker 0
+		MapMarkers.push(L.marker([15, 20],
+			{
+				draggable: false
+			}
+		));
+		MapMarkers[0].bindPopup("<strong>Map Scale Starting Pixel</strong>" +
+		"<br />Lat: " + MapMarkers[0].getLatLng().lat +
+		"<br/> Lon: " + MapMarkers[0].getLatLng().lng
+		);
+
+		// Marker 7 (SE  -  MAX Bound)
+		UtilityMarkers.push(L.marker([PaddedMaxBounds._southWest.lat, PaddedMaxBounds._southWest.lng],
+		{
+			draggable: false,
+		}
+		));
+		UtilityMarkers[0].bindPopup("<strong>South-West Padded Max Bounding Pin</strong>" +
+							"<br />Lat: " + UtilityMarkers[0].getLatLng().lat +
+							"<br/> Lon: " + UtilityMarkers[0].getLatLng().lng
+		);
+
+		const ScaleTestingMarkers_LG = L.layerGroup(MapMarkers);
+		const MapCornerMarkers_LG = L.layerGroup(UtilityMarkers);
+		const Graticule_LG = L.layerGroup([Graticule]);
+
+		const OverlayLayers = {
+			"Scale Testing Markers": ScaleTestingMarkers_LG,
+			"Map Corner Markers": MapCornerMarkers_LG,
+			"Scale Graticule": Graticule_LG
+		}
+
+		L.control.layers(null, OverlayLayers).addTo(map);
+
+		Graticule_LG.addTo(map);
+
+		const TestScaleControl = L.control.scale().addTo(map);
+		// 		console.log(map.options.crs);
+
+	</script>
+
+</body>
+</html>
