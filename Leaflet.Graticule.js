@@ -23,6 +23,9 @@ L.LatLngGraticule = L.Layer.extend({
     },
 
     initialize: function (options) {
+
+		//console.log(`[LatLngGraticule] INIT `);
+
         L.setOptions(this, options);
 
         var defaultFontName = 'Verdana';
@@ -58,6 +61,7 @@ L.LatLngGraticule = L.Layer.extend({
     },
 
     onAdd: function (map) {
+		//console.log(`[LatLngGraticule] onAdd() `);
         this._map = map;
 
         if (!this._container) {
@@ -78,6 +82,7 @@ L.LatLngGraticule = L.Layer.extend({
     },
 
     onRemove: function (map) {
+		//console.log(`[LatLngGraticule] onRemove() `);
         map.getPanes().overlayPane.removeChild(this._container);
 
         map.off('viewreset', this._reset, this);
@@ -90,17 +95,20 @@ L.LatLngGraticule = L.Layer.extend({
     },
 
     addTo: function (map) {
+		//console.log(`[LatLngGraticule] addTo() `);
         map.addLayer(this);
         return this;
     },
 
     setOpacity: function (opacity) {
+		//console.log(`[LatLngGraticule] setOpacity() | opacity: ${opacity}`);
         this.options.opacity = opacity;
         this._updateOpacity();
         return this;
     },
 
     bringToFront: function () {
+		//console.log(`[LatLngGraticule] bringToFront() `);
         if (this._canvas) {
             this._map._panes.overlayPane.appendChild(this._canvas);
         }
@@ -108,6 +116,7 @@ L.LatLngGraticule = L.Layer.extend({
     },
 
     bringToBack: function () {
+		//console.log(`[LatLngGraticule] bringToBack() `);
         var pane = this._map._panes.overlayPane;
         if (this._canvas) {
             pane.insertBefore(this._canvas, pane.firstChild);
@@ -120,7 +129,8 @@ L.LatLngGraticule = L.Layer.extend({
     },
 
     _initCanvas: function () {
-        this._container = L.DomUtil.create('div', 'leaflet-image-layer');
+		//console.log(`[LatLngGraticule] _initCanvas() `);
+        this._container = L.DomUtil.create('div', 'leaflet-image-layer Leaflet-Graticule');
 
         this._canvas = L.DomUtil.create('canvas', '');
 
@@ -159,6 +169,7 @@ L.LatLngGraticule = L.Layer.extend({
 // 	},
 
     _reset: function () {
+		//console.log(`[LatLngGraticule] _reset() `);
         var container = this._container,
             canvas = this._canvas,
             size = this._map.getSize(),
@@ -180,14 +191,18 @@ L.LatLngGraticule = L.Layer.extend({
     },
 
     _onCanvasLoad: function () {
+		//console.log(`[LatLngGraticule] _onCanvasLoad() `);
         this.fire('load');
     },
 
     _updateOpacity: function () {
+		//console.log(`[LatLngGraticule] _updateOpacity() `);
+		//console.log(`... opacity: ${this.options.opacity}`);
         L.DomUtil.setOpacity(this._canvas, this.options.opacity);
     },
 
     __format_lat: function(lat) {
+		//console.log(`[LatLngGraticule] __format_lat() `);
         if (this.options.latFormatTickLabel) {
             return this.options.latFormatTickLabel(lat);
         }
@@ -203,6 +218,7 @@ L.LatLngGraticule = L.Layer.extend({
     },
 
     __format_lng: function(lng) {
+		//console.log(`[LatLngGraticule] __format_lng() `);
         if (this.options.lngFormatTickLabel) {
             return this.options.lngFormatTickLabel(lng);
         }
@@ -227,6 +243,7 @@ L.LatLngGraticule = L.Layer.extend({
     },
 
     __calcInterval: function() {
+		//console.log(`[LatLngGraticule] __calcInterval() `);
         var zoom = this._map.getZoom();
         if (this._currZoom != zoom) {
             this._currLngInterval = 0;
@@ -272,6 +289,7 @@ L.LatLngGraticule = L.Layer.extend({
     },
 
     __draw: function(label) {
+		//console.log(`[LatLngGraticule] __draw() `);
         function _parse_px_to_int(txt) {
             if (txt.length > 2) {
                 if (txt.charAt(txt.length-2) == 'p') {
